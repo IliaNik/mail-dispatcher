@@ -1,0 +1,22 @@
+spring:
+  mail:
+    host: "smtp.gmail.com"
+    port: 25
+    username: "maildispatcher17@gmail.com"
+    password: "maildispatcher17"
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+          connecttimeout: 5000
+          timeout: 3000
+          writetimeout: 5000
+  mandatory-file-encoding: UTF-8
+  data:
+    mongodb:
+      database: mailDispatcher
+server:
+  port: 8090
