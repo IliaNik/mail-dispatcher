@@ -1,5 +1,13 @@
 target/
-!.mvn/wrapper/maven-wrapper.jar
+.mvn/wrapper
+
+# Package Files #
+*.jar
+*.war
+*.ear
+
+# Maven #
+mvnw
 
 ### STS ###
 .apt_generated
@@ -11,6 +19,7 @@ target/
 
 ### IntelliJ IDEA ###
 .idea
+.cmd
 *.iws
 *.iml
 *.ipr

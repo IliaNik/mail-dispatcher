@@ -4,6 +4,7 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import lombok.*;
 import org.hibernate.validator.constraints.Email;
+import org.hibernate.validator.constraints.Length;
 import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -21,7 +22,12 @@ public class Mail {
     @Id
     private Integer id;
 
-    @Size(min=1, max=240, message = "Check message length")
+    private Integer status;
+
+    @Length.List({
+            @Length(min = 1, message = "The text must be at least 1 character"),
+            @Length(max = 300, message = "The text must be less than 300 characters")
+    })
     private String text;
 
     @Email
