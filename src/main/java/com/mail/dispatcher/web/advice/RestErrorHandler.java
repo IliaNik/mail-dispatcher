@@ -34,6 +34,7 @@ public class RestErrorHandler {
 
     private ValidationErrorDTO processFieldErrors(List<FieldError> fieldErrors) {
         ValidationErrorDTO dto = new ValidationErrorDTO();
+        dto.setMessage("Bad fields");
 
         for (FieldError fieldError : fieldErrors) {
 

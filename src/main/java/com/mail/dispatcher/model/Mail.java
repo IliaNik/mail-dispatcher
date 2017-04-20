@@ -2,10 +2,11 @@ package com.mail.dispatcher.model;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.mail.dispatcher.util.MailStatus;
 import lombok.*;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
-import org.hibernate.validator.constraints.NotEmpty;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
@@ -20,9 +21,11 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @Document
 public class Mail {
     @Id
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Integer id;
 
-    private Integer status;
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    private MailStatus status;
 
     @Length.List({
             @Length(min = 1, message = "The text must be at least 1 character"),
@@ -38,6 +41,6 @@ public class Mail {
     @NotNull
     private String to;
 
-    @Size(max=100, message = "Check subject")
+    @Size(max=100, message = "Subject too long")
     private String subject;
 }

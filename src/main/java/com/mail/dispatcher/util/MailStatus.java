@@ -5,9 +5,9 @@ package com.mail.dispatcher.util;
  */
 
 public enum MailStatus {
-    EXPECTS(0, ""),
-    OK(1,""),
-    ERROR(2,"");
+    EXPECTS(1, ""),
+    OK(2,""),
+    ERROR(3,"");
 
     private final int value;
     private final String reasonPhrase;

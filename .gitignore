@@ -1,12 +1,12 @@
 target/
-.mvn/wrapper
+.mvn
 
 # Package Files #
-*.jar
 *.war
 *.ear
 
 # Maven #
+mvnw.cmd
 mvnw
 
 ### STS ###
