@@ -31,7 +31,7 @@ public class MailController {
     public  ResponseEntity<?> sendMail(@Valid @RequestBody Mail mail){
         final Integer id = mailService.addToProcessing(mail);
         return new ResponseEntity<>(id, HttpStatus.CREATED);
-    }
+}
 
     @RequestMapping(method = GET)
     public ResponseEntity<?> getDeliveryStatus(Integer id){

@@ -120,10 +120,15 @@ public class MailServiceImpl implements MailService {
                 Pageable pageable = new PageRequest(page, LIMIT);
                 List<Mail> mails = mailRepository.findByStatusOrderByDateAsc(MailStatus.EXPECTS, pageable);
                 if (!mails.isEmpty()) {
-                    final List<Integer> ids = mails.stream()
-                            .map(Mail::getId)
-                            .collect(collectingAndThen(toList(), ImmutableList::copyOf));
-                    queue.addAll(ids);
+                    mails.forEach((m) -> {
+                        try {
+                            queue.put(m.getId());
+                        } catch (InterruptedException e) {
+                            return;
+                        }
+                        m.setStatus(MailStatus.PROCESSED);
+                        save(m);
+                    });
                 } else {
                     return;
                 }
