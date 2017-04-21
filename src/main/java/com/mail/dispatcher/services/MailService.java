@@ -13,8 +13,12 @@ import org.springframework.stereotype.Service;
 public interface MailService {
 
     Mail save(@NonNull Mail mail);
+
     Mail get(@NonNull Integer id);
-    void addToProcessing(@NonNull Integer id);
-    MailStatus checkDeliveryStatus(@NonNull Integer id);
+
+    Integer addToProcessing(@NonNull Mail mail);
+
+    MailStatus getDeliveryStatus(@NonNull Integer id);
+
     void send(@NonNull Mail mail);
 }

@@ -2,12 +2,14 @@ package com.mail.dispatcher.model;
 
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.mail.dispatcher.util.MailStatus;
 import lombok.*;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 /**
@@ -25,6 +27,7 @@ public class Mail {
     private Integer id;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Indexed
     private MailStatus status;
 
     @Length.List({
@@ -42,5 +45,9 @@ public class Mail {
     private String to;
 
     @Size(max=100, message = "Subject too long")
+    @NotNull
     private String subject;
+
+    @NotNull
+    private Date date;
 }

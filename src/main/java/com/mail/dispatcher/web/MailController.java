@@ -29,9 +29,7 @@ public class MailController {
 
     @RequestMapping(method = POST)
     public  ResponseEntity<?> sendMail(@Valid @RequestBody Mail mail){
-        mail = mailService.save(mail);
-        Integer id = mail.getId();
-        mailService.addToProcessing(id);
+        final Integer id = mailService.addToProcessing(mail);
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
@@ -42,10 +40,12 @@ public class MailController {
                     "Id mustn't be null",
                     HttpStatus.BAD_REQUEST);
         }
-        MailStatus mailStatus = mailService.checkDeliveryStatus(id);
+        final MailStatus mailStatus = mailService.getDeliveryStatus(id);
 
         switch(mailStatus){
-            case EXPECTS: return new ResponseEntity<>("Message hasn't been delivered yet ", HttpStatus.PROCESSING);
+            case EXPECTS:
+            case PROCESSED:
+                return new ResponseEntity<>("Message hasn't been delivered yet ", HttpStatus.PROCESSING);
             case OK: return new ResponseEntity<>("The message was delivered successfully", HttpStatus.OK);
             case ERROR: return new ResponseEntity<>("The message can't be sent", HttpStatus.FORBIDDEN);
             default: {

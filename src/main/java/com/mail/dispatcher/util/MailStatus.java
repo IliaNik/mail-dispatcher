@@ -5,7 +5,8 @@ package com.mail.dispatcher.util;
  */
 
 public enum MailStatus {
-    EXPECTS(1, ""),
+    EXPECTS(0, ""),
+    PROCESSED(1, ""),
     OK(2,""),
     ERROR(3,"");
 
