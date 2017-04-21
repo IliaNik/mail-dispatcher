@@ -27,8 +27,8 @@ import static java.util.stream.Collectors.toList;
 public class MailServiceImpl implements MailService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MailServiceImpl.class);
-    private static final Integer CAPASITY = 300;
-    private static final Integer LIMIT = CAPASITY / 2;
+    private static final Integer CAPASITY = 100000;
+    private static final Integer LIMIT = CAPASITY / 10;
 
     private final BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(CAPASITY);
     private final ExecutorService executorService = Executors.newFixedThreadPool(2);
@@ -64,14 +64,15 @@ public class MailServiceImpl implements MailService {
 
     @Override
     public Integer addToProcessing(@NonNull Mail mail) {
-        mail.setStatus(MailStatus.EXPECTS);
         mail = save(mail);
         final Integer id = mail.getId();
 
         if (queue.offer(id) && mailRepository.countByStatus(MailStatus.EXPECTS) == 0) {
             mail.setStatus(MailStatus.PROCESSED);
+            save(mail);
         } else {
             mail.setStatus(MailStatus.EXPECTS);
+            save(mail);
             executorService.submit(Caretaker::new);
         }
         return id;
