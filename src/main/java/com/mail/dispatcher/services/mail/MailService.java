@@ -1,10 +1,10 @@
 package com.mail.dispatcher.services.mail;
 
-import com.mail.dispatcher.dto.files.FilesDto;
 import com.mail.dispatcher.model.Mail;
 import com.mail.dispatcher.model.MailStatus;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author IliaNik on 20.04.2017.
@@ -17,7 +17,7 @@ public interface MailService {
 
     Mail get(@NonNull Integer id);
 
-    Integer addToProcessing(@NonNull Mail mail, FilesDto filesDto);
+    Integer addToProcessing(@NonNull Mail mail, MultipartFile[] files);
 
     MailStatus getDeliveryStatus(@NonNull Integer id);
 

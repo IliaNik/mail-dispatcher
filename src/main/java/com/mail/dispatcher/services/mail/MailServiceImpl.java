@@ -5,7 +5,6 @@ import javax.mail.MessagingException;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
-import com.mail.dispatcher.dto.files.FilesDto;
 import com.mail.dispatcher.model.Mail;
 import com.mail.dispatcher.model.MailStatus;
 import com.mail.dispatcher.persistence.MailRepository;
@@ -63,21 +62,18 @@ public class MailServiceImpl implements MailService {
     }
 
     @Override
-    public Integer addToProcessing(@NonNull Mail mail, FilesDto filesDto) {
+    public Integer addToProcessing(@NonNull Mail mail, MultipartFile[] files) {
         mail.setDate(new Date());
         mail = save(mail);
         final Integer id = mail.getId();
-
-        if (filesDto != null) {
+        if (files != null) {
             mail.setMultipart(true);
-            final List<MultipartFile> files = filesDto.getFiles();
             for (MultipartFile file : files) {
                 if (!file.isEmpty()) {
                     fileService.store(file, mail.getId());
                 }
             }
         }
-
         if (mailRepository.countByStatus(MailStatus.EXPECTS) == 0 && queue.offer(id)) {
             mail.setStatus(MailStatus.PROCESSED);
             save(mail);

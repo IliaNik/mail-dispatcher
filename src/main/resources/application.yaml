@@ -1,4 +1,6 @@
 spring:
+  freemarker:
+    suffix: .ftl
   mail:
     host: "smtp.gmail.com"
     port: 25
