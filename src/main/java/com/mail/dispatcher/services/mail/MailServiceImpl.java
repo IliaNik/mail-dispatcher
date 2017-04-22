@@ -1,20 +1,16 @@
 package com.mail.dispatcher.services.mail;
 
 import javax.annotation.PostConstruct;
-import javax.mail.BodyPart;
-import javax.mail.Message;
 import javax.mail.MessagingException;
-import javax.mail.Multipart;
-import javax.mail.internet.MimeBodyPart;
-import javax.mail.internet.MimeMessage;
-import javax.mail.internet.MimeMultipart;
+import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
+import com.mail.dispatcher.dto.files.FilesDto;
 import com.mail.dispatcher.model.Mail;
-import com.mail.dispatcher.persistence.MailRepository;
 import com.mail.dispatcher.model.MailStatus;
+import com.mail.dispatcher.persistence.MailRepository;
 import com.mail.dispatcher.services.file.FileService;
-import com.mongodb.gridfs.GridFSDBFile;
+import com.mail.dispatcher.util.MailUtils;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author IliaNik on 20.04.2017.
@@ -66,9 +63,20 @@ public class MailServiceImpl implements MailService {
     }
 
     @Override
-    public Integer addToProcessing(@NonNull Mail mail) {
+    public Integer addToProcessing(@NonNull Mail mail, FilesDto filesDto) {
+        mail.setDate(new Date());
         mail = save(mail);
         final Integer id = mail.getId();
+
+        if (filesDto != null) {
+            mail.setMultipart(true);
+            final List<MultipartFile> files = filesDto.getFiles();
+            for (MultipartFile file : files) {
+                if (!file.isEmpty()) {
+                    fileService.store(file, mail.getId());
+                }
+            }
+        }
 
         if (mailRepository.countByStatus(MailStatus.EXPECTS) == 0 && queue.offer(id)) {
             mail.setStatus(MailStatus.PROCESSED);
@@ -89,7 +97,7 @@ public class MailServiceImpl implements MailService {
     @Override
     public void send(Mail mail) {
         try {
-            mailSender.send(toMimeMessage(mail));
+            mailSender.send(MailUtils.toMimeMessage(mail));
             LOG.info("Message was successfully sent!");
             mail.setStatus(MailStatus.OK);
         } catch (MessagingException e) {
@@ -97,31 +105,6 @@ public class MailServiceImpl implements MailService {
             mail.setStatus(MailStatus.ERROR);
         }
         save(mail);
-    }
-
-
-    private MimeMessage toMimeMessage(final Mail mail) throws MessagingException {
-        MimeMessage message = mailSender.createMimeMessage();
-        message.setFrom(mail.getFrom());
-        message.setRecipients(Message.RecipientType.TO, mail.getTo());
-        message.setSubject(mail.getSubject());
-
-        Multipart multipart = new MimeMultipart();
-
-        BodyPart bodyPart = new MimeBodyPart();
-        bodyPart.setText(mail.getText());
-        multipart.addBodyPart(bodyPart);
-
-        if (mail.isMultipart()) {
-            List<GridFSDBFile> files = fileService.find(mail.getId());
-            for (GridFSDBFile file : files) {
-                bodyPart = new MimeBodyPart(file.getInputStream());
-                bodyPart.setHeader("Content-Type", file.getContentType());
-                multipart.addBodyPart(bodyPart);
-            }
-        }
-        message.setContent(multipart);
-        return message;
     }
 
     private class Caretaker implements Runnable {
@@ -133,6 +116,7 @@ public class MailServiceImpl implements MailService {
                     try {
                         TimeUnit.SECONDS.sleep(1);
                     } catch (InterruptedException e) {
+                        LOG.error("Thread was interrupted!", e);
                         return;
                     }
                 }
@@ -142,6 +126,7 @@ public class MailServiceImpl implements MailService {
                     try {
                         queue.put(m.getId());
                     } catch (InterruptedException e) {
+                        LOG.error("Thread was interrupted!", e);
                         return;
                     }
                     m.setStatus(MailStatus.PROCESSED);

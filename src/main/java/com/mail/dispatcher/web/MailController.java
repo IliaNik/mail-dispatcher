@@ -1,16 +1,17 @@
 package com.mail.dispatcher.web;
 
 import javax.validation.Valid;
+import com.mail.dispatcher.dto.files.FilesDto;
 import com.mail.dispatcher.model.Mail;
-import com.mail.dispatcher.services.mail.MailService;
 import com.mail.dispatcher.model.MailStatus;
+import com.mail.dispatcher.services.mail.MailService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import static org.springframework.web.bind.annotation.RequestMethod.GET;
@@ -28,8 +29,10 @@ public class MailController {
     MailService mailService;
 
     @RequestMapping(method = POST)
-    public ResponseEntity<?> sendMail(@Valid @RequestBody Mail mail) {
-        final Integer id = mailService.addToProcessing(mail);
+    public ResponseEntity<?> sendMail(
+            @Valid @RequestPart("mail") Mail mail,
+            @RequestPart("files") FilesDto files) {
+        final Integer id = mailService.addToProcessing(mail, files);
         LOG.info("Mail with id {} added to processing", id);
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }

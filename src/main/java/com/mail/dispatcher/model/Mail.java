@@ -36,6 +36,7 @@ public class Mail {
     private String text;
 
     @Email
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @NotNull
     private String from;
 
@@ -48,7 +49,9 @@ public class Mail {
     private String subject;
 
     @NotNull
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date date;
 
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private boolean multipart;
 }

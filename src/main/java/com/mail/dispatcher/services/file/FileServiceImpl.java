@@ -21,7 +21,6 @@ import org.springframework.web.multipart.MultipartFile;
 public class FileServiceImpl implements FileService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileServiceImpl.class);
-    private static final String SAVE_ERROR_MSG = "Exception during file saving!";
     private static final String EMPTY_STRING = "";
 
     @Autowired
@@ -38,7 +37,7 @@ public class FileServiceImpl implements FileService {
             return gridFsTemplate.store(in, file.getOriginalFilename(), file.getContentType(), metaData)
                     .getId().toString();
         } catch (IOException e) {
-            LOG.error(SAVE_ERROR_MSG, e);
+            LOG.error("Exception during file saving!", e);
         }
         return EMPTY_STRING;
     }

@@ -1,5 +1,6 @@
 package com.mail.dispatcher.services.mail;
 
+import com.mail.dispatcher.dto.files.FilesDto;
 import com.mail.dispatcher.model.Mail;
 import com.mail.dispatcher.model.MailStatus;
 import lombok.NonNull;
@@ -16,7 +17,7 @@ public interface MailService {
 
     Mail get(@NonNull Integer id);
 
-    Integer addToProcessing(@NonNull Mail mail);
+    Integer addToProcessing(@NonNull Mail mail, FilesDto filesDto);
 
     MailStatus getDeliveryStatus(@NonNull Integer id);
 
