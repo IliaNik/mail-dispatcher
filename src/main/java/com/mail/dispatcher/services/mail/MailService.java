@@ -10,16 +10,15 @@ import org.springframework.web.multipart.MultipartFile;
  * @author IliaNik on 20.04.2017.
  */
 
-@Service
 public interface MailService {
 
     Mail save(@NonNull Mail mail);
 
-    Mail get(@NonNull Integer id);
+    Mail get(@NonNull String id);
 
-    Integer addToProcessing(@NonNull Mail mail, MultipartFile[] files);
+    String addToProcessing(@NonNull Mail mail, MultipartFile[] files);
 
-    MailStatus getDeliveryStatus(@NonNull Integer id);
+    MailStatus getDeliveryStatus(@NonNull String id);
 
     void send(@NonNull Mail mail);
 }

@@ -1,12 +1,16 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+    <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <meta charset="UTF-8">
-    <title>Uploading Files Example with Spring Boot, Freemarker</title>
+    <title>Mailing</title>
 </head>
 
-<body onload="updateSize();">
-<form name="mail" enctype="multipart/form-data" action="/" method="POST">
+<body>
+<form name="mail" onsubmit="">
 
     <p><b>Email of recipient: </b><br>
         <input type="text" name="to" placeholder="example@gmail.com"
@@ -21,99 +25,71 @@
                   maxlength="300" cols="40" rows="3" required/></textarea>
     </p>
     <p>
-        <input id="fileInput" type="file" name="uploadingFiles" onchange="updateSize();" multiple>
-        selected files: <span id="fileNum">0</span>;
-        total size: <span id="fileSize">0</span>
+        <input id="fileInput" type="file" name="uploadingFiles" multiple>
     </p>
     <p>
-        <input type="submit" value="Send message">
+        <button>Send message</button>
     </p>
 
-    <div id="log"></div>
+    <div id="log">gg</div>
 </form>
-<script>
-    function updateSize() {
-        var nBytes = 0,
-                oFiles = document.getElementById("fileInput").files,
-                nFiles = oFiles.length;
-        for (var nFileId = 0; nFileId < nFiles; nFileId++) {
-            nBytes += oFiles[nFileId].size;
-        }
-        var sOutput = nBytes + " bytes";
-        // optional code for multiples approximation
-        for (var aMultiples = ["KiB", "MiB", "GiB", "TiB", "PiB", "EiB", "ZiB", "YiB"], nMultiple = 0,
-                     nApprox = nBytes / 1024; nApprox > 1; nApprox /= 1024, nMultiple++) {
-            sOutput = nApprox.toFixed(3) + " " + aMultiples[nMultiple] + " (" + nBytes + " bytes)";
-        }
-        // end of optional code
-        document.getElementById("fileNum").innerHTML = nFiles;
-        document.getElementById("fileSize").innerHTML = sOutput;
-    }
+<script type="text/javascript">
 
     function log(html) {
         document.getElementById('log').innerHTML = html;
     }
 
-    document.forms.mail.onsubmit = function (f) {
-        var files = this.elements.uploadingFiles.files;
-        var mail = {
-            subject: this.elements.subject,
-            to: this.elements.to,
-            text: this.elements.text
-        };
-        if (files) {
-            upload(mail, files);
-        }
-        return false;
-    };
+    $("button").click(function () {
+        var mail = {};
+        mail.text = $("textarea[name=text]").val();
+        mail.to = $("input[name=to]").val();
+        mail.subject = $("input[name=subject]").val();
 
-
-    function upload(mail, files) {
-
-        var xhr = new XMLHttpRequest();
-
-        xhr.onreadystatechange = function () {
-            if (this.readyState == 4) {
-                if (this.status == 201) {
-                    log("Wait...");
-                    var id = this.responseText;
-                    checker(id);
-                } else if () {
-                    log("error " + this.status);
-                }
-            }
-        };
+        var files = document.getElementById('fileInput').files;
 
         var formData = new FormData();
-        var len = document.getElementById('file').files.length;
-        for (var i = 0; i < len; i++) {
-            formData.append("file" + i, document.getElementById('file').files[i]);
+        for (var i = 0; i < files.length; i++) {
+            formData.append("file" + i, files[i]);
         }
         formData.append("mail", new Blob([JSON.stringify(mail)], {
             type: "application/json"
         }));
-        xhr.open("POST", "/", true);
-        xhr.send(formData);
-    }
+        $.ajax({
+            url: "/send",
+            type: "POST",
+            data: formData,
+            cache: false,
+            processData: false,
+            contentType: false,
+            success: function (data) {
+                log("Wait...")
+                checker(data);
+            },
+            error: function () {
+                log("Error");
+
+            }
+        })
+
+    });
+
 
     function checker(id) {
         var intervalID = setInterval(function () {
-            var xhr = new XMLHttpRequest();
-            xhr.onreadystatechange = function () {
-                if (this.readyState == 4) {
-                    if (this.status == 200) {
+            $.ajax({
+                type: "GET",
+                url: "/" + id,
+                success: function (data, status) {
+                    if (status == 200) {
                         log("OK!");
                         clearInterval(intervalID);
-                    } else if (this.status == 403) {
-                        log("Forbidden!");
-                        clearInterval(intervalID);
                     }
+                },
+                error: function () {
+                    log("Error");
                 }
-            };
-            xhr.open("GET", "/" + id, true);
-            xhr.send();
-        }, 1000)
-    }
+            })
+        })}
 </script>
 </body>
 </html>

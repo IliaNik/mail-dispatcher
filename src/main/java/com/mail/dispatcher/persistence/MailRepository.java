@@ -13,7 +13,7 @@ import org.springframework.stereotype.Repository;
  */
 @Repository
 public interface MailRepository extends MongoRepository<Mail, Integer> {
-    Optional<Mail> findById(Integer id);
+    Optional<Mail> findById(String id);
 
     Integer countByStatus(MailStatus mailStatus);
 

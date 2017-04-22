@@ -17,18 +17,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author IliaNik on 20.04.2017.
  */
+@Service("mailService")
+@Transactional
 public class MailServiceImpl implements MailService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MailServiceImpl.class);
     private static final Integer CAPASITY = 100000;
     private static final Integer LIMIT = CAPASITY / 10;
 
-    private final BlockingQueue<Integer> queue = new ArrayBlockingQueue<>(CAPASITY);
+    private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(CAPASITY);
     private final ExecutorService executorService = Executors.newFixedThreadPool(2);
 
     @Autowired
@@ -44,7 +48,7 @@ public class MailServiceImpl implements MailService {
     private void queueProcessing() {
         executorService.submit(() -> {
             while (true) {
-                Integer id = queue.take();
+                String id = queue.take();
                 Mail mail = get(id);
                 send(mail);
             }
@@ -57,16 +61,16 @@ public class MailServiceImpl implements MailService {
     }
 
     @Override
-    public Mail get(@NonNull Integer id) {
+    public Mail get(@NonNull String id) {
         return mailRepository.findById(id).orElse(null);
     }
 
     @Override
-    public Integer addToProcessing(@NonNull Mail mail, MultipartFile[] files) {
+    public String addToProcessing(@NonNull Mail mail, MultipartFile[] files) {
         mail.setDate(new Date());
         mail = save(mail);
-        final Integer id = mail.getId();
-        if (files != null) {
+        final String id = mail.getId();
+        if (files.length != 0) {
             mail.setMultipart(true);
             for (MultipartFile file : files) {
                 if (!file.isEmpty()) {
@@ -86,7 +90,7 @@ public class MailServiceImpl implements MailService {
     }
 
     @Override
-    public MailStatus getDeliveryStatus(Integer id) {
+    public MailStatus getDeliveryStatus(String id) {
         return get(id).getStatus();
     }
 

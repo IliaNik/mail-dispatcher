@@ -12,12 +12,16 @@ import com.mail.dispatcher.model.Mail;
 import com.mail.dispatcher.services.file.FileService;
 import com.mongodb.gridfs.GridFSDBFile;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 
 /**
  * @author IliaNik on 22.04.2017.
  */
 public class MailUtils {
+
+    @Value("spring.mail.username")
+    private static String FROM;
 
     @Autowired
     private static JavaMailSender mailSender;
@@ -27,7 +31,7 @@ public class MailUtils {
 
     public static MimeMessage toMimeMessage(final Mail mail) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
-        message.setFrom(mail.getFrom());
+        message.setFrom(FROM);
         message.setRecipients(Message.RecipientType.TO, mail.getTo());
         message.setSubject(mail.getSubject());
 

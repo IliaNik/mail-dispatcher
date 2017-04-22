@@ -13,11 +13,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 /**
  * @author IliaNik on 22.04.2017.
  */
+@Service("fileService")
+@Transactional
 public class FileServiceImpl implements FileService {
 
     private static final Logger LOG = LoggerFactory.getLogger(FileServiceImpl.class);
@@ -27,7 +31,7 @@ public class FileServiceImpl implements FileService {
     private GridFsTemplate gridFsTemplate;
 
     @Override
-    public String store(@NonNull MultipartFile file, @NonNull Integer messageId) {
+    public String store(@NonNull MultipartFile file, @NonNull String messageId) {
         LOG.info("store file from multipart {}", file);
 
         DBObject metaData = new BasicDBObject();
@@ -43,7 +47,7 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<GridFSDBFile> find(Integer messageId) {
+    public List<GridFSDBFile> find(String messageId) {
         return gridFsTemplate.find(new Query(Criteria.where("metadata.messageId").is(messageId)));
     }
 }

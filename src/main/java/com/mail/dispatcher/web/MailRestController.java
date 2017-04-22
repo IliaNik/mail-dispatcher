@@ -23,17 +23,17 @@ public class MailRestController {
     @Autowired
     MailService mailService;
 
-    @PostMapping("/")
+    @PostMapping("/send")
     public ResponseEntity<?> sendMail(
             @Valid @RequestPart("mail") Mail mail,
             @RequestPart("uploadingFiles") MultipartFile[] files) {
-        final Integer id = mailService.addToProcessing(mail, files);
+        final String id = mailService.addToProcessing(mail, files);
         LOG.info("Mail with id {} added to processing", id);
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<?> getDeliveryStatus(@PathVariable("id") Integer id) {
+    public ResponseEntity<?> getDeliveryStatus(@PathVariable("id") String id) {
         if (id == null) {
             LOG.error("Bad request");
             return new ResponseEntity<>(

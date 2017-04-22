@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.*;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
+import org.springframework.beans.factory.annotation.*;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
@@ -16,14 +17,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
  */
 
 @Data
-@AllArgsConstructor
 @NoArgsConstructor
-@Builder
 @Document
 public class Mail {
     @Id
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    private Integer id;
+    private String id;
 
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Indexed
@@ -35,11 +34,6 @@ public class Mail {
     })
     private String text;
 
-    @Email
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @NotNull
-    private String from;
-
     @Email(message = "Check email")
     @NotNull
     private String to;
@@ -48,7 +42,6 @@ public class Mail {
     @NotNull
     private String subject;
 
-    @NotNull
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private Date date;
 
