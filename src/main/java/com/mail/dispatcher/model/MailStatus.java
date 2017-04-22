@@ -1,4 +1,4 @@
-package com.mail.dispatcher.util;
+package com.mail.dispatcher.model;
 
 /**
  * @author IliaNik on 20.04.2017.

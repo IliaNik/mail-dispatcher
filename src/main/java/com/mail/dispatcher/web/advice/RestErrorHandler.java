@@ -16,12 +16,6 @@ import org.springframework.web.bind.annotation.ResponseStatus;
  */
 @ControllerAdvice
 public class RestErrorHandler {
-
-
-//    TODO: internationalization
-//    @Autowired
-//    private MessageSource messageSource;
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ResponseBody
@@ -37,16 +31,9 @@ public class RestErrorHandler {
         dto.setMessage("Bad fields");
 
         for (FieldError fieldError : fieldErrors) {
-
-            //String localizedErrorMessage = resolveLocalizedErrorMessage(fieldError);
             dto.addFieldError(fieldError.getCode(), fieldError.getDefaultMessage(), fieldError.getField());
         }
 
         return dto;
     }
-
-//    private String resolveLocalizedErrorMessage(FieldError fieldError) {
-//        Locale currentLocale =  LocaleContextHolder.getLocale();
-//        return messageSource.getMessage(fieldError, currentLocale);
-//    }
 }

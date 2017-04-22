@@ -4,7 +4,6 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.util.Date;
 import com.fasterxml.jackson.annotation.JsonProperty;
-import com.mail.dispatcher.util.MailStatus;
 import lombok.*;
 import org.hibernate.validator.constraints.Email;
 import org.hibernate.validator.constraints.Length;
@@ -50,4 +49,6 @@ public class Mail {
 
     @NotNull
     private Date date;
+
+    private boolean multipart;
 }

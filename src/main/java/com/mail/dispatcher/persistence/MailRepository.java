@@ -3,7 +3,7 @@ package com.mail.dispatcher.persistence;
 import java.util.List;
 import java.util.Optional;
 import com.mail.dispatcher.model.Mail;
-import com.mail.dispatcher.util.MailStatus;
+import com.mail.dispatcher.model.MailStatus;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;

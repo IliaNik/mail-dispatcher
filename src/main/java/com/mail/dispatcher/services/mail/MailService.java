@@ -1,7 +1,7 @@
-package com.mail.dispatcher.services;
+package com.mail.dispatcher.services.mail;
 
 import com.mail.dispatcher.model.Mail;
-import com.mail.dispatcher.util.MailStatus;
+import com.mail.dispatcher.model.MailStatus;
 import lombok.NonNull;
 import org.springframework.stereotype.Service;
 
