@@ -1,1 +1,1 @@
-error
+Internal Error

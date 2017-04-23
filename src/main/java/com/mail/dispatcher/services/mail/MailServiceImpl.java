@@ -105,15 +105,15 @@ public class MailServiceImpl implements MailService {
         List<File> files = fileService.find(mail.getId());
         try {
             mailSender.send(MailUtils.toMimeMessage(mail, mailSender, files));
-            MailUtils.cleaning(files);
-
             LOG.info("Message was successfully sent!");
             mail.setStatus(MailStatus.OK);
         } catch (MessagingException e) {
             LOG.error("Message sending failed!", e);
             mail.setStatus(MailStatus.ERROR);
+        }finally {
+            save(mail);
+            MailUtils.cleaning(files);
         }
-        save(mail);
     }
 
     private class Caretaker implements Runnable {
