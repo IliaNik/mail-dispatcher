@@ -4,21 +4,25 @@ spring:
   mail:
     host: "smtp.gmail.com"
     port: 25
-    username: "maildispatcher17@gmail.com"
-    password: "maildispatcher17"
+    username: "musicforall07@gmail.com"
+    password: "PolyInkExt"
     properties:
       mail:
+        transport:
+          protocol: "smtp"
         smtp:
           auth: true
           starttls:
-            enable: true
-            required: true
-          connecttimeout: 5000
-          timeout: 3000
-          writetimeout: 5000
+            enable: "true"
+        debug: "true"
   mandatory-file-encoding: UTF-8
   data:
     mongodb:
       database: mailDispatcher
+  http:
+    multipart:
+      max-file-size: 30MB
+      max-request-size: 30MB
+
 server:
   port: 8090

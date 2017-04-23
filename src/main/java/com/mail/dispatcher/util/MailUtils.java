@@ -1,16 +1,21 @@
 package com.mail.dispatcher.util;
 
-import javax.mail.BodyPart;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.Multipart;
 import javax.mail.internet.MimeBodyPart;
 import javax.mail.internet.MimeMessage;
 import javax.mail.internet.MimeMultipart;
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import com.google.common.io.Files;
 import com.mail.dispatcher.model.Mail;
 import com.mail.dispatcher.services.file.FileService;
 import com.mongodb.gridfs.GridFSDBFile;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -23,33 +28,35 @@ public class MailUtils {
     @Value("spring.mail.username")
     private static String FROM;
 
-    @Autowired
-    private static JavaMailSender mailSender;
-
-    @Autowired
-    private static FileService fileService;
-
-    public static MimeMessage toMimeMessage(final Mail mail) throws MessagingException {
+    public static MimeMessage toMimeMessage(final Mail mail, JavaMailSender mailSender,
+                                            List<File> files) throws MessagingException {
         MimeMessage message = mailSender.createMimeMessage();
         message.setFrom(FROM);
         message.setRecipients(Message.RecipientType.TO, mail.getTo());
         message.setSubject(mail.getSubject());
 
-        Multipart multipart = new MimeMultipart();
+        Multipart multipart = new MimeMultipart("mixed");
 
-        BodyPart bodyPart = new MimeBodyPart();
+        MimeBodyPart bodyPart = new MimeBodyPart();
         bodyPart.setText(mail.getText());
         multipart.addBodyPart(bodyPart);
 
         if (mail.isMultipart()) {
-            List<GridFSDBFile> files = fileService.find(mail.getId());
-            for (GridFSDBFile file : files) {
-                bodyPart = new MimeBodyPart(file.getInputStream());
-                bodyPart.setHeader("Content-Type", file.getContentType());
+            for (File file : files) {
+                bodyPart = new MimeBodyPart();
+                try {
+                    bodyPart.attachFile(file);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
                 multipart.addBodyPart(bodyPart);
             }
         }
         message.setContent(multipart);
         return message;
+    }
+
+    public static void cleaning(List<File> files) {
+        files.forEach(File::delete);
     }
 }

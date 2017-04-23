@@ -2,6 +2,7 @@ package com.mail.dispatcher.services.mail;
 
 import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
+import java.io.File;
 import java.util.Date;
 import java.util.List;
 import java.util.concurrent.*;
@@ -14,6 +15,7 @@ import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.mail.javamail.JavaMailSender;
@@ -29,8 +31,10 @@ import org.springframework.web.multipart.MultipartFile;
 public class MailServiceImpl implements MailService {
 
     private static final Logger LOG = LoggerFactory.getLogger(MailServiceImpl.class);
-    private static final Integer CAPASITY = 100000;
+    private static final Integer CAPASITY = 100;
     private static final Integer LIMIT = CAPASITY / 10;
+    @Value("${spring.mail.username}")
+    private String FROM;
 
     private final BlockingQueue<String> queue = new ArrayBlockingQueue<>(CAPASITY);
     private final ExecutorService executorService = Executors.newFixedThreadPool(2);
@@ -47,8 +51,10 @@ public class MailServiceImpl implements MailService {
     @PostConstruct
     private void queueProcessing() {
         executorService.submit(() -> {
+            LOG.info("Start scheduling task");
             while (true) {
                 String id = queue.take();
+                LOG.info("Id {} was taken out of queue", id);
                 Mail mail = get(id);
                 send(mail);
             }
@@ -96,8 +102,11 @@ public class MailServiceImpl implements MailService {
 
     @Override
     public void send(Mail mail) {
+        List<File> files = fileService.find(mail.getId());
         try {
-            mailSender.send(MailUtils.toMimeMessage(mail));
+            mailSender.send(MailUtils.toMimeMessage(mail, mailSender, files));
+            MailUtils.cleaning(files);
+
             LOG.info("Message was successfully sent!");
             mail.setStatus(MailStatus.OK);
         } catch (MessagingException e) {

@@ -10,7 +10,7 @@
 </head>
 
 <body>
-<form name="mail" onsubmit="">
+<form name="uploadForm" method="POST" action="javascript:void(null);" onsubmit="">
 
     <p><b>Email of recipient: </b><br>
         <input type="text" name="to" placeholder="example@gmail.com"
@@ -28,10 +28,10 @@
         <input id="fileInput" type="file" name="uploadingFiles" multiple>
     </p>
     <p>
-        <button>Send message</button>
+        <button id="valera">Send message</button>
     </p>
 
-    <div id="log">gg</div>
+    <div id="log">____________________________________</div>
 </form>
 <script type="text/javascript">
 
@@ -39,7 +39,7 @@
         document.getElementById('log').innerHTML = html;
     }
 
-    $("button").click(function () {
+    $("#valera").click(function () {
         var mail = {};
         mail.text = $("textarea[name=text]").val();
         mail.to = $("input[name=to]").val();
@@ -49,47 +49,51 @@
 
         var formData = new FormData();
         for (var i = 0; i < files.length; i++) {
-            formData.append("file" + i, files[i]);
+            formData.append("uploadingFiles[]", files[i]);
         }
+
         formData.append("mail", new Blob([JSON.stringify(mail)], {
             type: "application/json"
         }));
-        $.ajax({
-            url: "/send",
-            type: "POST",
-            data: formData,
-            cache: false,
-            processData: false,
-            contentType: false,
-            success: function (data) {
-                log("Wait...")
-                checker(data);
-            },
-            error: function () {
-                log("Error");
 
-            }
-        })
-
+        $.when($.ajax(
+                {
+                    url: "/send",
+                    type: "POST",
+                    data: formData,
+                    cache: false,
+                    processData: false,
+                    contentType: false
+                }
+        ))
+                .then(function (data) {
+                    log("Wait...");
+                    checker(data);
+                }, function (xhr, status) {
+                    log(xhr.responseText + "-" + status);
+                    return false;
+                });
     });
 
 
     function checker(id) {
-        var intervalID = setInterval(function () {
-            $.ajax({
+        setTimeout(function run() {
+            $.when($.ajax({
                 type: "GET",
-                url: "/" + id,
-                success: function (data, status) {
-                    if (status == 200) {
-                        log("OK!");
-                        clearInterval(intervalID);
-                    }
-                },
-                error: function () {
-                    log("Error");
-                }
-            })
-        })}
+                url: "/get/" + id
+            }))
+                    .then(function (data, statusText, xhr) {
+                        if (xhr.status == 200) {
+                            log("OK!");
+                        } else {
+                            setTimeout(run, 1000)
+                        }
+                    }, function (data, statusText, xhr) {
+                        log(xhr.status );
+                        return false;
+                    });
+        }, 3000);
+    }
 </script>
 </body>
 </html>

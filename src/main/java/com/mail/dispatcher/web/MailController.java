@@ -10,8 +10,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @Controller
 public class MailController {
 
-    @RequestMapping("/")
+    @RequestMapping("/dispatcher")
     public String mail(Model model) {
-        return "mail";
+        return "dispatcher";
     }
 }

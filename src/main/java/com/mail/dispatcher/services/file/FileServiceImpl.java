@@ -1,8 +1,12 @@
 package com.mail.dispatcher.services.file;
 
+import javax.mail.internet.MimeBodyPart;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
+import com.google.common.io.Files;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFSDBFile;
@@ -47,7 +51,21 @@ public class FileServiceImpl implements FileService {
     }
 
     @Override
-    public List<GridFSDBFile> find(String messageId) {
-        return gridFsTemplate.find(new Query(Criteria.where("metadata.messageId").is(messageId)));
+    public List<File> find(String messageId) {
+        List<GridFSDBFile> fsdbFiles = gridFsTemplate.find(new Query(Criteria.where("metadata.messageId").is(messageId)));
+        List<File> files = new ArrayList<>();
+        for (GridFSDBFile file : fsdbFiles) {
+            InputStream inputStream = file.getInputStream();
+            File targetFile = new File("src/main/resources/" + file.getFilename());
+            try {
+                byte[] buffer = new byte[inputStream.available()];
+                inputStream.read(buffer);
+                Files.write(buffer, targetFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            files.add(targetFile);
+        }
+        return files;
     }
 }

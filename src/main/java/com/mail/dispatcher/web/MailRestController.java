@@ -16,23 +16,22 @@ import org.springframework.web.multipart.MultipartFile;
  * @author IliaNik on 19.04.2017.
  */
 @RestController
-@RequestMapping("/")
 public class MailRestController {
     private static final Logger LOG = LoggerFactory.getLogger(MailRestController.class);
 
     @Autowired
     MailService mailService;
 
-    @PostMapping("/send")
+    @RequestMapping(value = "/send", method = RequestMethod.POST)
     public ResponseEntity<?> sendMail(
             @Valid @RequestPart("mail") Mail mail,
-            @RequestPart("uploadingFiles") MultipartFile[] files) {
+            @RequestPart("uploadingFiles[]") MultipartFile[] files) {
         final String id = mailService.addToProcessing(mail, files);
         LOG.info("Mail with id {} added to processing", id);
         return new ResponseEntity<>(id, HttpStatus.CREATED);
     }
 
-    @GetMapping("/{id}")
+    @RequestMapping(value = "/get/{id}", method = RequestMethod.GET)
     public ResponseEntity<?> getDeliveryStatus(@PathVariable("id") String id) {
         if (id == null) {
             LOG.error("Bad request");
@@ -46,7 +45,7 @@ public class MailRestController {
             case EXPECTS:
             case PROCESSED: {
                 LOG.debug("The message with id {} hasn't been delivered yet", id);
-                return new ResponseEntity<>("The message hasn't been delivered yet ", HttpStatus.PROCESSING);
+                return new ResponseEntity<>("The message hasn't been delivered yet ", HttpStatus.NO_CONTENT);
             }
             case OK: {
                 LOG.info("Message with id {} was delivered successfully", id);
