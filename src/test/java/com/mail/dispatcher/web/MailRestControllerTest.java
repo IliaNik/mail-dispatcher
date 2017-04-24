@@ -49,8 +49,6 @@ public class MailRestControllerTest {
         when(mailService.getDeliveryStatus(any(String.class))).thenReturn(MailStatus.PROCESSED);
 
         final ResponseEntity<?> responseEntity = sut.getDeliveryStatus(ID);
-
-        verify(mailService).getDeliveryStatus(ID);
         assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
     }
 

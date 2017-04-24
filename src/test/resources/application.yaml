@@ -15,7 +15,6 @@ spring:
           starttls:
             enable: "true"
         debug: "true"
-  mandatory-file-encoding: UTF-8
   data:
     mongodb:
       database: mailDispatcher

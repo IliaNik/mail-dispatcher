@@ -167,7 +167,7 @@
                     } else if(data.status == 403){
                         log(data.responseText)
                     } else {
-                        log("Error");
+                        log("File too big!");
                     }
                     return false;
                 });
