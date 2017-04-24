@@ -56,7 +56,7 @@ public class FileServiceImpl implements FileService {
         List<File> files = new ArrayList<>();
         for (GridFSDBFile file : fsdbFiles) {
             InputStream inputStream = file.getInputStream();
-            File targetFile = new File("src/main/resources/" + file.getFilename());
+            File targetFile = new File("src/main/resources/temporary/" + file.getFilename());
             try {
                 byte[] buffer = new byte[inputStream.available()];
                 inputStream.read(buffer);

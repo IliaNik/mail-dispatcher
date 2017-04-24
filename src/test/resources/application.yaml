@@ -1,0 +1,29 @@
+spring:
+  freemarker:
+    suffix: .ftl
+  mail:
+    host: "localhost"
+    port: 3025
+    username: "musicforall07@gmail.com"
+    password: "PolyInkExt"
+    properties:
+      mail:
+        transport:
+          protocol: "smtp"
+        smtp:
+          auth: true
+          starttls:
+            enable: "true"
+        debug: "true"
+  mandatory-file-encoding: UTF-8
+  data:
+    mongodb:
+      database: mailDispatcher
+      host: 127.0.0.1
+  http:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+
+server:
+  port: 8090

@@ -1,5 +1,6 @@
 package com.mail.dispatcher.services.mail;
 
+import java.util.Optional;
 import com.mail.dispatcher.model.Mail;
 import com.mail.dispatcher.model.MailStatus;
 import lombok.NonNull;

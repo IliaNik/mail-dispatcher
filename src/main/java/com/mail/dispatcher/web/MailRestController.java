@@ -1,6 +1,7 @@
 package com.mail.dispatcher.web;
 
 import javax.validation.Valid;
+import java.util.Arrays;
 import com.mail.dispatcher.model.Mail;
 import com.mail.dispatcher.model.MailStatus;
 import com.mail.dispatcher.services.mail.MailService;
@@ -18,6 +19,8 @@ import org.springframework.web.multipart.MultipartFile;
 @RestController
 public class MailRestController {
     private static final Logger LOG = LoggerFactory.getLogger(MailRestController.class);
+    private static final String[] ALLOWED_FILE_TYPES = {"image/", "audio/", "video/", "text/",
+            "application/pdf", "text/", "application/vnd", "application/msword"};
 
     @Autowired
     MailService mailService;
@@ -26,6 +29,17 @@ public class MailRestController {
     public ResponseEntity<?> sendMail(
             @Valid @RequestPart("mail") Mail mail,
             @RequestPart("uploadingFiles[]") MultipartFile[] files) {
+
+        for(MultipartFile file : files){
+            boolean allowed = Arrays.stream(ALLOWED_FILE_TYPES)
+                    .anyMatch((t) -> {
+                        return file.getContentType().startsWith(t);
+                    });
+            if(!allowed){
+                return new ResponseEntity<>("File type not supported", HttpStatus.FORBIDDEN);
+            }
+        }
+
         final String id = mailService.addToProcessing(mail, files);
         LOG.info("Mail with id {} added to processing", id);
         return new ResponseEntity<>(id, HttpStatus.CREATED);
@@ -39,7 +53,15 @@ public class MailRestController {
                     "Id mustn't be null",
                     HttpStatus.BAD_REQUEST);
         }
-        final MailStatus mailStatus = mailService.getDeliveryStatus(id);
+
+
+        final MailStatus mailStatus;
+
+        if (mailService.getDeliveryStatus(id) != null) {
+            mailStatus = mailService.getDeliveryStatus(id);
+        } else {
+            mailStatus = MailStatus.EXPECTS;
+        }
 
         switch (mailStatus) {
             case EXPECTS:

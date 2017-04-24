@@ -96,7 +96,8 @@
         <span>Message</span><textarea name="text" onkeyup="adjust_textarea(this)" required="true"></textarea>
     </label>
     <label>
-        <input id="fileInput" type="file" name="uploadingFiles" multiple>
+        <input id="fileInput" type="file" name="uploadingFiles" multiple
+">
     </label>
     <label>
         <span>&nbsp;</span><input type="button" id="sendButton" value="Send Letter" />
@@ -163,6 +164,8 @@
                         data.responseJSON.fieldErrors.forEach(function (f) {
                             log(f.message + "<br>");
                         });
+                    } else if(data.status == 403){
+                        log(data.responseText)
                     } else {
                         log("Error");
                     }

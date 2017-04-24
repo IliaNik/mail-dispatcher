@@ -5,6 +5,7 @@ import javax.mail.MessagingException;
 import java.io.File;
 import java.util.Date;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.*;
 import com.mail.dispatcher.model.Mail;
 import com.mail.dispatcher.model.MailStatus;
