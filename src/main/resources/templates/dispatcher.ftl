@@ -8,52 +8,106 @@
     <script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
     <script src="//code.jquery.com/ui/1.11.4/jquery-ui.min.js"></script>
     <style type="text/css">
-        .center {
+        .form-style-4{
             margin: auto;
+            width: 450px;
+            font-size: 16px;
+            background: #495C70;
+            padding: 30px 30px 15px 30px;
+            border: 5px solid #53687E;
         }
-        .frame {
-            width: 50%;
-            border: 3px solid #e6a95b;
-            padding: 10px;
+        .form-style-4 input[type=button],
+        .form-style-4 input[type=file],
+        .form-style-4 input[type=text],
+        .form-style-4 input[type=email],
+        .form-style-4 textarea,
+        .form-style-4 label
+        {
+            font-family: Georgia, "Times New Roman", Times, serif;
+            font-size: 16px;
+            color: #fff;
+
+        }
+        .form-style-4 label {
+            display:block;
+            margin-bottom: 10px;
+        }
+        .form-style-4 label > span{
+            display: inline-block;
+            float: left;
+            width: 150px;
+        }
+        .form-style-4 input[type=text],
+        .form-style-4 input[type=email]
+        {
+            background: transparent;
+            border: none;
+            border-bottom: 1px dashed #83A4C5;
+            width: 275px;
+            outline: none;
+            padding: 0px 0px 0px 0px;
+            font-style: italic;
+        }
+        .form-style-4 textarea{
+            font-style: italic;
+            padding: 0px 0px 0px 0px;
+            background: transparent;
+            outline: none;
+            border: none;
+            border-bottom: 1px dashed #83A4C5;
+            width: 275px;
+            overflow: hidden;
+            resize:none;
+            height:20px;
+        }
+
+        .form-style-4 textarea:focus,
+        .form-style-4 input[type=text]:focus,
+        .form-style-4 input[type=email]:focus,
+        .form-style-4 input[type=email] :focus
+        {
+            border-bottom: 1px dashed #D9FFA9;
+        }
+
+        .form-style-4 input[type=button],
+        .form-style-4 input[type=file]{
+            background: #576E86;
+            border: none;
+            padding: 8px 10px 8px 10px;
+            border-radius: 5px;
+            color: #A8BACE;
+        }
+        .form-style-4 input[type=button]:hover,
+        .form-style-4 input[type=file]:hover{
+            background: #394D61;
         }
     </style>
 </head>
 
 <body>
-<div class="center frame"
-    <form name="uploadForm" method="POST" action="javascript:void(null);" onsubmit="">
-
-        <p class="email center"><b>Email of recipient: </b><br>
-            <input type="text" name="to" placeholder="example@gmail.com"
-                   maxlength="30" required/>
-        </p class="subject center">
-        <p><b>Theme: </b><br>
-            <input type="text" name="subject" placeholder="The best message dispatcher"
-                   maxlength="30" required/>
-        </p>
-        <p class="message center">Message:<Br>
-            <textarea name="text" placeholder="I use the best message dispatcher in the world!"
-                      maxlength="300" cols="40" rows="3" required/></textarea>
-        </p>
-        <p class="fileInput center">
-            <input id="fileInput" type="file" name="uploadingFiles" multiple>
-        </p>
-        <p class="sendButton center">
-            <button id="sendButton"> Send </button>
-        </p>
-        </p>
-
-        <div id="log">____________________________________</div>
-    </form>
-</div>
+<form class="form-style-4" name="uploadForm" method="POST" action="javascript:void(null);" onsubmit="">
+    <label for="to">
+        <span>Email Address</span><input type="email" name="to" required="true" />
+    </label>
+    <label for="subject">
+        <span>Subject</span><input type="text" name="subject" required="true" />
+    </label>
+    <label for="text">
+        <span>Message</span><textarea name="text" onkeyup="adjust_textarea(this)" required="true"></textarea>
+    </label>
+    <label>
+        <input id="fileInput" type="file" name="uploadingFiles" multiple>
+    </label>
+    <label>
+        <span>&nbsp;</span><input type="button" id="sendButton" value="Send Letter" />
+    </label>
+    <label id="log">
+    </label>
+</form>
 <script type="text/javascript">
 
     function log(html) {
-        document.getElementById('log').innerHTML = html;
-    }
-
-    function error(html) {
-        document.getElementById('log').innerHTML = <font color="red" face="Arial">html</font>;
+        $("#log").html(html);
     }
 
     function validateForm() {
@@ -66,7 +120,7 @@
             return true;
         }
         else {
-            error("All fields must be filled")
+            log("All fields must be filled")
             return false;
         }
     }
@@ -110,7 +164,7 @@
                             error(f.message + "<br>");
                         });
                     } else {
-                        error("Error");
+                        log("Error");
                     }
                     return false;
                 });
@@ -130,10 +184,15 @@
                             setTimeout(run, 1000)
                         }
                     }, function (data, statusText, xhr) {
-                        error(xhr.status);
+                        log(xhr.status);
                         return false;
                     });
         }, 3000);
+    }
+
+    function adjust_textarea(h) {
+        h.style.height = "20px";
+        h.style.height = (h.scrollHeight)+"px";
     }
 </script>
 </body>
