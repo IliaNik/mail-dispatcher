@@ -161,7 +161,7 @@
                 }, function (data, statusText, xhr) {
                     if (data.status == 400) {
                         data.responseJSON.fieldErrors.forEach(function (f) {
-                            error(f.message + "<br>");
+                            log(f.message + "<br>");
                         });
                     } else {
                         log("Error");
