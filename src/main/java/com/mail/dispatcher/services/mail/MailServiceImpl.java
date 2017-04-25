@@ -3,6 +3,7 @@ package com.mail.dispatcher.services.mail;
 import javax.annotation.PostConstruct;
 import javax.mail.MessagingException;
 import java.io.File;
+import java.nio.file.Path;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;

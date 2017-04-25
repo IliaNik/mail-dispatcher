@@ -1,16 +1,17 @@
 package com.mail.dispatcher.services.file;
 
-import javax.mail.internet.MimeBodyPart;
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
+import java.io.*;
+import java.net.URI;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import com.google.common.io.Files;
+import java.util.Optional;
 import com.mongodb.BasicDBObject;
 import com.mongodb.DBObject;
 import com.mongodb.gridfs.GridFSDBFile;
 import lombok.NonNull;
+import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +22,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import static java.nio.file.Files.*;
+import static java.util.Objects.requireNonNull;
+
 /**
  * @author IliaNik on 22.04.2017.
  */
@@ -28,6 +32,9 @@ import org.springframework.web.multipart.MultipartFile;
 @Transactional
 public class FileServiceImpl implements FileService {
 
+    public static final int CHUNK_SIZE = 500_000;
+    public static final int DEFAULT_CHUNK_ID = 0;
+    private String attachmentsDirectory = "src/main/resources/temporary/";
     private static final Logger LOG = LoggerFactory.getLogger(FileServiceImpl.class);
     private static final String EMPTY_STRING = "";
 
@@ -55,17 +62,44 @@ public class FileServiceImpl implements FileService {
         List<GridFSDBFile> fsdbFiles = gridFsTemplate.find(new Query(Criteria.where("metadata.messageId").is(messageId)));
         List<File> files = new ArrayList<>();
         for (GridFSDBFile file : fsdbFiles) {
-            InputStream inputStream = file.getInputStream();
-            File targetFile = new File("src/main/resources/temporary/" + file.getFilename());
-            try {
-                byte[] buffer = new byte[inputStream.available()];
-                inputStream.read(buffer);
-                Files.write(buffer, targetFile);
+            Path path = null;
+            try (InputStream in = file.getInputStream()) {
+                files.add(saveTrack(in, file.getFilename()).toFile());
             } catch (IOException e) {
-                e.printStackTrace();
             }
-            files.add(targetFile);
         }
         return files;
+    }
+
+    private Path saveTrack(final InputStream stream, final String fileName) throws IOException {
+        final Path path = Paths.get(attachmentsDirectory);
+        File file = new File(attachmentsDirectory + fileName);
+        final Path tmp = Paths.get(file.getAbsolutePath());
+        try (BufferedInputStream in = new BufferedInputStream(stream);
+             OutputStream out = newOutputStream(tmp)) {
+
+            IOUtils.copy(in, out);
+            splitFile(tmp, path);
+        }
+        return tmp;
+    }
+
+    private void splitFile(final Path filePath, final Path dirPath) throws IOException {
+        int partCounter = DEFAULT_CHUNK_ID;
+        final byte[] buffer = new byte[CHUNK_SIZE];
+        try (BufferedInputStream bis = new BufferedInputStream(newInputStream(filePath))) {
+            int length = bis.read(buffer);
+            while (length > 0) {
+                final Path chunkPath = dirPath.resolve(createChunkName(partCounter++));
+                try (OutputStream out = newOutputStream(chunkPath)) {
+                    out.write(buffer, 0, length);
+                }
+                length = bis.read(buffer);
+            }
+        }
+    }
+
+    private String createChunkName(int counter) {
+        return String.format("%04d", counter);
     }
 }

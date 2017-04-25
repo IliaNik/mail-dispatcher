@@ -9,6 +9,7 @@ import javax.mail.internet.MimeMultipart;
 import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import com.google.common.io.Files;
@@ -41,22 +42,23 @@ public class MailUtils {
         bodyPart.setText(mail.getText());
         multipart.addBodyPart(bodyPart);
 
-        if (mail.isMultipart()) {
-            for (File file : files) {
-                bodyPart = new MimeBodyPart();
-                try {
-                    bodyPart.attachFile(file);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                multipart.addBodyPart(bodyPart);
+        for (File file : files) {
+            bodyPart = new MimeBodyPart();
+            try {
+                bodyPart.attachFile(file);
+            } catch (IOException e) {
+                e.printStackTrace();
             }
+            multipart.addBodyPart(bodyPart);
         }
+
         message.setContent(multipart);
         return message;
     }
 
     public static void cleaning(List<File> files) {
-        files.forEach(File::delete);
+        files.forEach((p) -> {
+            p.delete();
+        });
     }
 }

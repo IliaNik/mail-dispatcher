@@ -1,6 +1,7 @@
 package com.mail.dispatcher.services.file;
 
 import java.io.File;
+import java.nio.file.Path;
 import java.util.List;
 import org.springframework.web.multipart.MultipartFile;
 
