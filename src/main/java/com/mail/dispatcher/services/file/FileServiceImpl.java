@@ -72,7 +72,6 @@ public class FileServiceImpl implements FileService {
     }
 
     private Path saveFile(final InputStream stream, final String fileName) throws IOException {
-        final Path path = Paths.get(attachmentsDirectory);
         File file = new File(attachmentsDirectory + fileName);
         final Path tmp = Paths.get(file.getAbsolutePath());
         try (BufferedInputStream in = new BufferedInputStream(stream);
