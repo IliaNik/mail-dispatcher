@@ -6,7 +6,7 @@
 	<groupId>com.mail.dispatcher</groupId>
 	<artifactId>mail-dispatcher</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<packaging>jar</packaging>
+	<packaging>war</packaging>
 
 	<name>mail-dispatcher</name>
 	<description>The project provides an opportunity for mass mailing of emails</description>

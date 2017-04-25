@@ -1,33 +1,33 @@
-target/
-.mvn
-
-# Package Files #
-*.war
-*.ear
-
-# Maven #
-mvnw.cmd
-mvnw
-
-### STS ###
-.apt_generated
-.classpath
-.factorypath
-.project
-.settings
-.springBeans
-
-### IntelliJ IDEA ###
-.idea
-.cmd
-*.iws
-*.iml
-*.ipr
-
-### NetBeans ###
-nbproject/private/
-build/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
+#target/
+#.mvn
+#
+## Package Files #
+#*.war
+#*.ear
+#
+## Maven #
+#mvnw.cmd
+#mvnw
+#
+#### STS ###
+#.apt_generated
+#.classpath
+#.factorypath
+#.project
+#.settings
+#.springBeans
+#
+#### IntelliJ IDEA ###
+#.idea
+#.cmd
+#*.iws
+#*.iml
+#*.ipr
+#
+#### NetBeans ###
+#nbproject/private/
+#build/
+#nbbuild/
+#dist/
+#nbdist/
+#.nb-gradle/

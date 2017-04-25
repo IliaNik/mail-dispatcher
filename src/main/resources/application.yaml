@@ -17,7 +17,9 @@ spring:
         debug: "true"
   data:
     mongodb:
-      database: mailDispatcher
+      database: mails
+      username: admin
+      password: 8-jBXxvJy9Ws
   http:
     multipart:
       max-file-size: 100MB
