@@ -15,6 +15,7 @@ import org.apache.tomcat.util.http.fileupload.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.mongodb.core.query.Criteria;
 import org.springframework.data.mongodb.core.query.Query;
 import org.springframework.data.mongodb.gridfs.GridFsTemplate;
@@ -32,9 +33,8 @@ import static java.util.Objects.requireNonNull;
 @Transactional
 public class FileServiceImpl implements FileService {
 
-    public static final int CHUNK_SIZE = 500_000;
-    public static final int DEFAULT_CHUNK_ID = 0;
-    private String attachmentsDirectory = "src/main/resources/temporary/";
+    @Value("${app.attachmentsDirectory}")
+    private String attachmentsDirectory;
     private static final Logger LOG = LoggerFactory.getLogger(FileServiceImpl.class);
     private static final String EMPTY_STRING = "";
 
@@ -64,42 +64,22 @@ public class FileServiceImpl implements FileService {
         for (GridFSDBFile file : fsdbFiles) {
             Path path = null;
             try (InputStream in = file.getInputStream()) {
-                files.add(saveTrack(in, file.getFilename()).toFile());
+                files.add(saveFile(in, file.getFilename()).toFile());
             } catch (IOException e) {
             }
         }
         return files;
     }
 
-    private Path saveTrack(final InputStream stream, final String fileName) throws IOException {
+    private Path saveFile(final InputStream stream, final String fileName) throws IOException {
         final Path path = Paths.get(attachmentsDirectory);
         File file = new File(attachmentsDirectory + fileName);
         final Path tmp = Paths.get(file.getAbsolutePath());
         try (BufferedInputStream in = new BufferedInputStream(stream);
              OutputStream out = newOutputStream(tmp)) {
-
             IOUtils.copy(in, out);
-            splitFile(tmp, path);
+            out.flush();
         }
         return tmp;
-    }
-
-    private void splitFile(final Path filePath, final Path dirPath) throws IOException {
-        int partCounter = DEFAULT_CHUNK_ID;
-        final byte[] buffer = new byte[CHUNK_SIZE];
-        try (BufferedInputStream bis = new BufferedInputStream(newInputStream(filePath))) {
-            int length = bis.read(buffer);
-            while (length > 0) {
-                final Path chunkPath = dirPath.resolve(createChunkName(partCounter++));
-                try (OutputStream out = newOutputStream(chunkPath)) {
-                    out.write(buffer, 0, length);
-                }
-                length = bis.read(buffer);
-            }
-        }
-    }
-
-    private String createChunkName(int counter) {
-        return String.format("%04d", counter);
     }
 }
