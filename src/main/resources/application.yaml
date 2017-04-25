@@ -19,7 +19,7 @@ spring:
     mongodb:
       database: mails
       username: admin
-      password: 8-jBXxvJy9Ws
+      password: 1BX1MM8B1-fn
   http:
     multipart:
       max-file-size: 100MB
