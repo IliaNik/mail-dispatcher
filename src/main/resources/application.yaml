@@ -18,8 +18,6 @@ spring:
   data:
     mongodb:
       database: mails
-      username: admin
-      password: 1BX1MM8B1-fn
   http:
     multipart:
       max-file-size: 100MB
@@ -28,4 +26,4 @@ spring:
 server:
   port: 8090
 app:
-  attachmentsDirectory: "src/main/resources/temporary/"
+  attachmentsDirectory: "src/main/resources/temporary"
