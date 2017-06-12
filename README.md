@@ -1,4 +1,4 @@
-# mail-dispatcher
+# ✉ Mail-dispatcher ✉
 The application that allows you to enter the email address of the recipient, subject, text and attach such files as:<br>
 document, picture, video, audio, and any combination of the above.<br>
 <hr>
